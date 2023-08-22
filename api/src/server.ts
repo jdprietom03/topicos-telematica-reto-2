@@ -1,8 +1,8 @@
 import express, { Request, Response } from "express";
 import multer from "multer";
-import { context } from "./context.js";
-import { Run as RungRPC } from "./grpc-run.js";
-import { Run as RunAMQP } from "./amqp-run.js";
+import { context } from "./context";
+import { Run as RungRPC } from "./grpc-run";
+import { Run as RunAMQP } from "./amqp-run";
 
 const app = express();
 

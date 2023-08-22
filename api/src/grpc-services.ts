@@ -1,10 +1,9 @@
-import { context } from './context.js';
-import grpc from '@grpc/grpc-js';
-import protoLoader from '@grpc/proto-loader';
-import { credentials } from '@grpc/grpc-js';
-import { ProductService } from './../proto/Service.proto';
+import { context } from './context';
+import { loadSync } from '@grpc/proto-loader';
+import { loadPackageDefinition, credentials, Client } from '@grpc/grpc-js';
+import { ProductServiceClient } from './../generated/proto/Service_grpc_pb';
 
-const packageDefinition = protoLoader.loadSync(
+const packageDefinition = loadSync(
     context.PROTO_PATH,
     {
         keepCase: true,
@@ -14,14 +13,14 @@ const packageDefinition = protoLoader.loadSync(
         oneofs: true
     });
 
-const PackageDefinition = grpc.loadPackageDefinition(packageDefinition);
+const PackageDefinition = loadPackageDefinition(packageDefinition);
 
-const ClientBuilder = (service: string) => { 
-    const ServiceConstructor = PackageDefinition[service] as typeof grpc.Client;
+const ClientBuilder = (service: string): Client => { 
+    const ServiceConstructor = PackageDefinition[service] as typeof Client;
     
     return new ServiceConstructor(context.GRPC_HOST, credentials.createInsecure());
 }
 
 export const Services = {
-    ProductService: (): ProductService => ClientBuilder("ProductService")
+    ProductService: (): ProductServiceClient => ClientBuilder("ProductService") as any
 }
