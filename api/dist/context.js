@@ -1,6 +1,12 @@
-import dotenv from 'dotenv';
-dotenv.config();
-export const context = {
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.context = void 0;
+const dotenv_1 = __importDefault(require("dotenv"));
+dotenv_1.default.config();
+exports.context = {
     PROTO_PATH: process.env.PROTO_PATH,
     GRPC_HOST: process.env.GRPC_HOST,
     REMOTE_PORT: process.env.REMOTE_PORT,

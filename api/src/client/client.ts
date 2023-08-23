@@ -1,8 +1,9 @@
 import express, { Request, Response } from "express";
 import multer from "multer";
 import { context } from "./context";
-import { Run as RungRPC } from "./grpc-run";
+import { Clients } from "./grpc-clients";
 import { Run as RunAMQP } from "./amqp-run";
+import { Client } from "@grpc/grpc-js";
 
 const app = express();
 
@@ -15,11 +16,19 @@ app.get('/amqp', (req: Request, res: Response) => {
 });
 
 app.get('/grpc', (req: Request, res: Response) => {
-	RungRPC(req, res);
+	Clients.ProductClient.addProduct(req, res);
 });
 
-app.post('/grpc', multer().any(), (req: Request, res: Response) => {
-	RungRPC(req, res);
+app.get('/product/add', multer().any(), (req: Request, res: Response) => {
+	Clients.ProductClient.addProduct(req, res);
+});
+
+app.get('/file/list', multer().any(), (req: Request, res: Response) => {
+	Clients.FileClient.listFiles(req, res);
+});
+
+app.get('/file/find', multer().any(), (req: Request, res: Response) => {
+	Clients.FileClient.findFileByName(req, res);
 });
 
 app.listen(context.REMOTE_PORT, () => {

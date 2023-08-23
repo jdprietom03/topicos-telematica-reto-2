@@ -8,7 +8,7 @@
     "noFallthroughCasesInSwitch": true,
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "rootDirs": ["src"],
+    "rootDirs": ["src/**"],
     "outDir": "dist",
     "lib": ["ES2022"], // ES2020 in earlier versions
     "module": "CommonJS", //ESNext 

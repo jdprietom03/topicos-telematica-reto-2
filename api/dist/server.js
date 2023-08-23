@@ -1,21 +1,18 @@
-import express from "express";
-import multer from "multer";
-import { context } from "./context.js";
-import { Run as RungRPC } from "./grpc-run.js";
-import { Run as RunAMQP } from "./amqp-run.js";
-const app = express();
-app.get('/', (req, res) => {
-    res.send("Pong!");
-});
-app.get('/amqp', (req, res) => {
-    RunAMQP(req, res);
-});
-app.get('/grpc', (req, res) => {
-    RungRPC(req, res);
-});
-app.post('/grpc', multer().any(), (req, res) => {
-    RungRPC(req, res);
-});
-app.listen(context.REMOTE_PORT, () => {
-    console.log(`Listen to port: ${context.REMOTE_PORT}`);
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const grpc_js_1 = require("@grpc/grpc-js");
+const Service_grpc_pb_1 = require("../generated/proto/Service_grpc_pb");
+const Service_pb_1 = require("../generated/proto/Service_pb");
+const addProduct = (call, callback) => {
+    const response = new Service_pb_1.TransactionResponse();
+    console.log(call.request.toObject());
+    response.setStatusCode(200);
+    callback(null, response);
+};
+const server = new grpc_js_1.Server();
+const productService = Service_grpc_pb_1.ProductServiceService;
+server.addService(productService, { addProduct });
+server.bindAsync('0.0.0.0:4000', grpc_js_1.ServerCredentials.createInsecure(), () => {
+    server.start();
+    console.log('server is running on 0.0.0.0:4000');
 });
