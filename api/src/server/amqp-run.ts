@@ -34,10 +34,6 @@ export default class AMQPServer {
         return;
       }
   
-      amqpChannel.assertExchange(context.RMQ_EXCHANGE, context.RMQ_TYPE, {
-        durable: true,
-      });
-  
       amqpChannel.consume('list_service', this.onListService);
       amqpChannel.consume('find_service', this.onFindService);
 
@@ -73,10 +69,6 @@ export default class AMQPServer {
     if (!amqpChannel || !msg) {
       return;
     }
-
-    amqpChannel.assertExchange(context.RMQ_EXCHANGE, context.RMQ_TYPE, {
-      durable: true,
-    });
 
     const { replyTo, correlationId } = msg.properties;
 
