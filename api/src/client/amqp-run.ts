@@ -56,12 +56,12 @@ export default class AMQPClient {
           amqpChannel.consume(this.replyTo, this.onResponse, {
             noAck: false
           });
+
+          this.channel = channel;
+
+            this.run(conn);
         },
       );
-
-      this.channel = channel;
-
-      this.run(conn);
     });
   }
 
@@ -100,7 +100,7 @@ export default class AMQPClient {
 
   public onResponse(msg: Message | null): void {
     if (msg && msg.properties.correlationId == this.correlationId) {
-      this.response = response;
+      this.response = msg.content.toString('utf-8') as any;
     }
   }
 }
