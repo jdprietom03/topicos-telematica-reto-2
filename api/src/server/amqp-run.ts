@@ -34,7 +34,9 @@ export default class AMQPServer {
         return;
       }
   
-      amqpChannel.consume('list_service', this.onListService);
+      amqpChannel.consume('list_service', this.onListService, undefined, (err, ok) => {
+        console.log(ok.consumerTag, err)
+      });
       amqpChannel.consume('find_service', this.onFindService);
 
       this.channel = channel;
