@@ -45,7 +45,7 @@ export default class FileService {
         .filter((file) => regex.test(file))
         .map((file) => this.getFileStats(path.join(this.dirPath, file)));
     } catch (err) {
-        console.log(err)
+      console.log(err);
       throw new Error('Error al buscar archivos: ' + err);
     }
   }

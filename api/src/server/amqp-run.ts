@@ -43,7 +43,10 @@ export default class AMQPServer {
       `amqp://${context.RMQ_USER}:${context.RMQ_PASS}@${context.RMQ_HOST}`,
       (err, conn) => {
         if (err) {
-            console.log(err, `amqp://${context.RMQ_USER}:${context.RMQ_PASS}@${context.RMQ_HOST}`)
+          console.log(
+            err,
+            `amqp://${context.RMQ_USER}:${context.RMQ_PASS}@${context.RMQ_HOST}`,
+          );
           throw err;
         }
 
@@ -55,7 +58,7 @@ export default class AMQPServer {
 
   private init(): void {
     if (!this.channel) {
-        return;
+      return;
     }
 
     const amqpChannel = this.channel.getChannel();
@@ -92,7 +95,7 @@ export default class AMQPServer {
 
   private publish(response: any, msg: Message | null): void {
     if (!this.channel) {
-        return;
+      return;
     }
 
     const amqpChannel = this.channel.getChannel();

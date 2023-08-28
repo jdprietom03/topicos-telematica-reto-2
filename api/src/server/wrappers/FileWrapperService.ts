@@ -42,7 +42,7 @@ export class FileWrapperService extends ProtoWrapperService {
     callback: sendUnaryData<FindFilesResponse>,
   ): void {
     const response = new FindFilesResponse();
-    
+
     const files = new FileService().findFileByName(call.request.getFileName());
 
     response.setFilesInfoList(

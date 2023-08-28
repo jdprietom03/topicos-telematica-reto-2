@@ -11,11 +11,23 @@ class AMQPChannel {
     this.initChannel(conn);
   }
 
-  public static getInstance(conn: Connection): AMQPChannel {
+  public static async getInstance(conn: Connection): Promise<AMQPChannel> {
     if (!AMQPChannel.instance) {
       AMQPChannel.instance = new AMQPChannel(conn);
+
+      await AMQPChannel.instance.initializeChannel();
     }
     return AMQPChannel.instance;
+  }
+
+  public async initializeChannel() {
+    return new Promise<void>((resolve, reject) => {
+      if (this.channel) {
+        resolve();
+      } else {
+        reject(new Error('Canal no inicializado'));
+      }
+    });
   }
 
   private initChannel(conn: Connection): void {
@@ -27,7 +39,10 @@ class AMQPChannel {
     });
   }
 
-  public getChannel(): Channel | undefined {
+  public getChannel(): Channel {
+    if (!this.channel) {
+      throw new Error('Canal no inicializado');
+    }
     return this.channel;
   }
 }
@@ -36,7 +51,7 @@ export default class AMQPClient {
   private correlationId: string | undefined;
   private response: object | undefined;
   private connection: Connection | undefined;
-  private channel: AMQPChannel | undefined;
+  private channel: AMQPChannel | null = null;
   private route: string;
   private replyTo: string;
 
@@ -47,24 +62,33 @@ export default class AMQPClient {
     this.publish();
   }
 
-  private init = async () => {
-    amqp.connect(
-      `amqp://${context.RMQ_USER}:${context.RMQ_PASS}@${context.RMQ_HOST}`,
-      (err, conn) => {
-        if (err) { 
-          throw err;
-        }
+  private async init() {
+    return new Promise<void>((resolve, reject) => {
+      amqp.connect(
+        `amqp://${context.RMQ_USER}:${context.RMQ_PASS}@${context.RMQ_HOST}`,
+        (err, conn) => {
+          if (err) {
+            reject(err);
+          } else {
+            AMQPChannel.getInstance(conn)
+              .then((amqpChannel) => {
+                this.channel = amqpChannel;
+                resolve();
+              })
+              .catch(reject);
+          }
+        },
+      );
+    });
+  }
 
-        this.channel = AMQPChannel.getInstance(conn);
-      },
-    );
-  };
-
-  private publish(): void {
+  private async publish() {
     if (!this.channel) {
       return;
     }
 
+    await this.channel.initializeChannel();
+    
     const amqpChannel = this.channel.getChannel();
 
     if (!amqpChannel) {
@@ -87,16 +111,19 @@ export default class AMQPClient {
     );
   }
 
-  public run(request: Request, response: Response) {
+  public async run(request: Request, response: Response) {
     if (!this.channel) {
       return;
     }
 
+    await this.channel.initializeChannel();
+    
     const amqpChannel = this.channel.getChannel();
 
     if (!amqpChannel) {
       return;
     }
+
 
     const { body } = request;
     this.correlationId = uuid();

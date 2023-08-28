@@ -53,7 +53,7 @@ export class FileClient extends ProtoClient<FileServiceClient> {
       const { params } = req;
 
       findFilesRequest.setFileName(params.pattern);
-      
+
       const result = (await findFilesPromise(
         findFilesRequest,
       )) as FindFilesResponse;
