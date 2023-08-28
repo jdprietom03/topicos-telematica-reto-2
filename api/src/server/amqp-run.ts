@@ -34,22 +34,22 @@ export default class AMQPServer {
         return;
       }
   
-      amqpChannel.consume('list_service', this.onListService, undefined, (err, ok) => {
-        console.log(ok.consumerTag, err)
+      amqpChannel.consume('list_service', (msg) => {
+        this.onListService(amqpChannel, msg);
       });
-      amqpChannel.consume('find_service', this.onFindService);
-
-      this.channel = channel;
+      amqpChannel.consume('find_service', (msg) => {
+        this.onListService(amqpChannel, msg);
+      });
    })
   }
 
-  private onListService(msg: Message | null) {
+  private onListService(channel: Channel, msg: Message | null) {
     const files = new FileService().listFiles();
 
-    this.publish(files, msg);
+    this.publish(channel, files, msg);
   }
 
-  private onFindService(msg: Message | null) {
+  private onFindService(channel: Channel, msg: Message | null) {
     if (!msg) {
       return;
     }
@@ -58,15 +58,12 @@ export default class AMQPServer {
       msg.content.toString('utf-8'),
     );
 
-    this.publish(files, msg);
+    this.publish(channel, files, msg);
   }
 
-  private publish(response: any, msg: Message | null): void {
-    if (!this.channel) {
-      return;
-    }
+  private publish(channel: Channel, response: any, msg: Message | null): void {
 
-    const amqpChannel = this.channel;
+    const amqpChannel = channel;
 
     if (!amqpChannel || !msg) {
       return;
@@ -74,7 +71,7 @@ export default class AMQPServer {
 
     const { replyTo, correlationId } = msg.properties;
 
-    amqpChannel.publish('', replyTo, Buffer.from(response), { correlationId });
+    amqpChannel.sendToQueue(replyTo,  Buffer.from(response), { correlationId })
 
     amqpChannel.ack(msg);
   }
