@@ -1,8 +1,7 @@
 import amqp, { Channel, Connection, Message } from 'amqplib/callback_api.js';
 import { context } from './context';
-import { Request, Response, response } from 'express';
-import { v4 as uuid } from 'uuid';
 import FileService from './services/FileService';
+import { logger } from '../client/context';
 
 export default class AMQPServer {
   private channel: Channel | null = null;
@@ -27,25 +26,25 @@ export default class AMQPServer {
   };
 
   private init(conn: Connection): void {
-   conn.createChannel((err, channel) => {
+    conn.createChannel((err, channel) => {
       const amqpChannel = channel;
-  
+
       if (!amqpChannel) {
         return;
       }
-  
+
       amqpChannel.consume('list_service', (msg) => {
         this.onListService(amqpChannel, msg);
       });
       amqpChannel.consume('find_service', (msg) => {
         this.onFindService(amqpChannel, msg);
       });
-   })
+    });
   }
 
   private onListService(channel: Channel, msg: Message | null) {
     const files = new FileService().listFiles();
-    console.log("LISTING SERVICE: ")
+    logger.info('LIST SERVICE for ', msg?.properties.correlationId);
     this.publish(channel, files, msg);
   }
 
@@ -53,7 +52,8 @@ export default class AMQPServer {
     if (!msg) {
       return;
     }
-    console.log("FINDING SERVICE: ")
+    
+    logger.info('FIND SERVICE for ', msg?.properties.correlationId);
 
     const files = new FileService().findFileByName(
       msg.content.toString('utf-8'),
@@ -63,7 +63,6 @@ export default class AMQPServer {
   }
 
   private publish(channel: Channel, response: any, msg: Message | null): void {
-
     const amqpChannel = channel;
 
     if (!amqpChannel || !msg) {
@@ -72,9 +71,7 @@ export default class AMQPServer {
 
     const { replyTo, correlationId } = msg.properties;
 
-    console.log("SENT: ", response)
-
-    amqpChannel.sendToQueue(replyTo,  Buffer.from(response), { correlationId })
+    amqpChannel.sendToQueue(replyTo, Buffer.from(response), { correlationId });
 
     amqpChannel.ack(msg);
   }

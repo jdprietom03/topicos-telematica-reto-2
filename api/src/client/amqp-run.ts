@@ -1,11 +1,11 @@
 import amqp, { Channel, Connection, Message } from 'amqplib/callback_api.js';
-import { context } from './context';
+import { context, logger } from './context';
 import { Request, Response, response } from 'express';
 import { v4 as uuid } from 'uuid';
 
 export default class AMQPClient {
   private correlationId: string | undefined;
-  private response: object | undefined;
+  private response: string;
   private connection: Connection | undefined;
   private channel: Channel | undefined;
   private route: string;
@@ -18,6 +18,7 @@ export default class AMQPClient {
     this.replyTo = '';
     this.req = req;
     this.res = res;
+    this.response = '';
     this.init();
   }
 
@@ -54,12 +55,12 @@ export default class AMQPClient {
         (err, ok) => {
           this.replyTo = ok.queue;
           amqpChannel.consume(this.replyTo, this.onResponse.bind(this), {
-            noAck: false
+            noAck: false,
           });
 
           this.channel = channel;
 
-            this.run(conn);
+          this.run(conn);
         },
       );
     });
@@ -68,40 +69,39 @@ export default class AMQPClient {
   public run(conn: Connection) {
     const amqpChannel = this.channel;
 
-      if (!amqpChannel) {
-        return;
-      }
+    if (!amqpChannel) {
+      return;
+    }
 
-      const { body } = this.req;
-      this.correlationId = uuid();
-      this.response = undefined;
-      const msg = JSON.stringify(body) || "";
-      const published = amqpChannel.publish(
-        context.RMQ_EXCHANGE,
-        this.route,
-        Buffer.from(msg),
-        {
-          replyTo: this.replyTo,
-          correlationId: this.correlationId,
-        },
-      );
+    const { body } = this.req;
+    this.correlationId = uuid();
+    this.response = '';
+    const msg = JSON.stringify(body) || '';
+    const published = amqpChannel.publish(
+      context.RMQ_EXCHANGE,
+      this.route,
+      Buffer.from(msg),
+      {
+        replyTo: this.replyTo,
+        correlationId: this.correlationId,
+      },
+    );
 
-      if (published) {
-
-        setTimeout(() => {
-          if (this.connection && this.channel) {
-            this.connection.close();
-            amqpChannel.close(() => {});
-          }
-        }, 200);
-      }
+    if (published) {
+      setTimeout(() => {
+        if (this.connection) {
+          this.connection.close();
+          amqpChannel.close(() => {});
+        }
+      }, 200);
+    }
   }
 
   public onResponse(msg: Message | null): void {
     if (msg && msg.properties.correlationId == this.correlationId) {
       this.response = msg.content.toString('utf-8') as any;
-      console.log("WITH RESPONSE: ", this.response)
-      this.res.send(this.response)
+      logger.info('WITH RESPONSE: ', this.response);
+      this.res.send(JSON.parse(this.response));
     }
   }
 }

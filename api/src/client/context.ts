@@ -1,6 +1,9 @@
 import dotenv from 'dotenv';
+import { pino } from 'pino';
 
 dotenv.config();
+
+export const logger = pino();
 
 export const context = {
   PROTO_PATH: process.env.PROTO_PATH as string,
