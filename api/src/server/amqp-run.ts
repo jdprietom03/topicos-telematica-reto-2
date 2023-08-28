@@ -45,7 +45,7 @@ export default class AMQPServer {
 
   private onListService(channel: Channel, msg: Message | null) {
     const files = new FileService().listFiles();
-
+    console.log("LISTING SERVICE: ")
     this.publish(channel, files, msg);
   }
 
@@ -53,6 +53,7 @@ export default class AMQPServer {
     if (!msg) {
       return;
     }
+    console.log("FINDING SERVICE: ")
 
     const files = new FileService().findFileByName(
       msg.content.toString('utf-8'),
@@ -70,6 +71,8 @@ export default class AMQPServer {
     }
 
     const { replyTo, correlationId } = msg.properties;
+
+    console.log("SENT: ", response)
 
     amqpChannel.sendToQueue(replyTo,  Buffer.from(response), { correlationId })
 

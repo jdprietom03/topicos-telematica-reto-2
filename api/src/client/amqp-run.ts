@@ -87,7 +87,6 @@ export default class AMQPClient {
       );
 
       if (published) {
-        this.res.send(this.response);
 
         setTimeout(() => {
           if (this.connection && this.channel) {
@@ -101,6 +100,8 @@ export default class AMQPClient {
   public onResponse(msg: Message | null): void {
     if (msg && msg.properties.correlationId == this.correlationId) {
       this.response = msg.content.toString('utf-8') as any;
+      console.log("WITH RESPONSE: ", this.response)
+      this.res.send(this.response)
     }
   }
 }
