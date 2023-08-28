@@ -68,8 +68,6 @@ export class FileClient extends ProtoClient<FileServiceClient> {
   }
 
   public async handleFallback(route: string, req: Request, res: Response) {
-    const client = new AMQPClient(route);
-
-    client.run(req, res);
+    const client = new AMQPClient(route, req, res);
   }
 }

@@ -10,10 +10,14 @@ export default class AMQPClient {
   private channel: Channel | undefined;
   private route: string;
   private replyTo: string;
+  private req: Request;
+  private res: Response;
 
-  constructor(route: string) {
+  constructor(route: string, req: Request, res: Response) {
     this.route = route;
     this.replyTo = '';
+    this.req = req;
+    this.res = res;
   }
 
   public async init() {
@@ -53,19 +57,19 @@ export default class AMQPClient {
       );
 
       this.channel = channel;
+
+      this.run();
     });
   }
 
-  public async run(request: Request, response: Response) {
-    this.init().then(() => {
-        console.log("INICIALIZANDO: ", this.channel)
-      const amqpChannel = this.channel;
+  public run() {
+    const amqpChannel = this.channel;
 
       if (!amqpChannel) {
         return;
       }
 
-      const { body } = request;
+      const { body } = this.req;
       this.correlationId = uuid();
       this.response = undefined;
 
@@ -80,7 +84,7 @@ export default class AMQPClient {
       );
 
       if (published) {
-        response.send(this.response);
+        this.res.send(this.response);
 
         setTimeout(() => {
           if (this.connection && this.channel) {
@@ -89,7 +93,6 @@ export default class AMQPClient {
           }
         }, 200);
       }
-    });
   }
 
   public onResponse(msg: Message | null): void {
