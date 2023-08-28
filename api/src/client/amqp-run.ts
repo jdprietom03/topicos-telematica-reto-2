@@ -18,9 +18,10 @@ export default class AMQPClient {
     this.replyTo = '';
     this.req = req;
     this.res = res;
+    this.init();
   }
 
-  public async init() {
+  public init() {
     amqp.connect(
       `amqp://${context.RMQ_USER}:${context.RMQ_PASS}@${context.RMQ_HOST}`,
       (err, conn) => {
@@ -72,11 +73,11 @@ export default class AMQPClient {
       const { body } = this.req;
       this.correlationId = uuid();
       this.response = undefined;
-
+      const msg = JSON.stringify(body) || "";
       const published = amqpChannel.publish(
         context.RMQ_EXCHANGE,
         this.route,
-        Buffer.from(JSON.stringify(body)),
+        Buffer.from(msg),
         {
           replyTo: this.replyTo,
           correlationId: this.correlationId,

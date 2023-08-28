@@ -4,37 +4,8 @@ import { Request, Response, response } from 'express';
 import { v4 as uuid } from 'uuid';
 import FileService from './services/FileService';
 
-class AMQPChannel {
-  private static instance: AMQPChannel;
-  private channel: Channel | undefined;
-
-  private constructor(conn: Connection) {
-    this.initChannel(conn);
-  }
-
-  public static getInstance(conn: Connection): AMQPChannel {
-    if (!AMQPChannel.instance) {
-      AMQPChannel.instance = new AMQPChannel(conn);
-    }
-    return AMQPChannel.instance;
-  }
-
-  private initChannel(conn: Connection): void {
-    conn.createChannel((err, channel) => {
-      if (err) {
-        throw err;
-      }
-      this.channel = channel;
-    });
-  }
-
-  public getChannel(): Channel | undefined {
-    return this.channel;
-  }
-}
-
 export default class AMQPServer {
-  private channel: AMQPChannel | undefined;
+  private channel: Channel | null = null;
 
   constructor() {}
 
@@ -50,29 +21,28 @@ export default class AMQPServer {
           throw err;
         }
 
-        this.channel = AMQPChannel.getInstance(conn);
-        this.init();
+        this.init(conn);
       },
     );
   };
 
-  private init(): void {
-    if (!this.channel) {
-      return;
-    }
+  private init(conn: Connection): void {
+   conn.createChannel((err, channel) => {
+      const amqpChannel = channel;
+  
+      if (!amqpChannel) {
+        return;
+      }
+  
+      amqpChannel.assertExchange(context.RMQ_EXCHANGE, context.RMQ_TYPE, {
+        durable: true,
+      });
+  
+      amqpChannel.consume('list_service', this.onListService);
+      amqpChannel.consume('find_service', this.onFindService);
 
-    const amqpChannel = this.channel.getChannel();
-
-    if (!amqpChannel) {
-      return;
-    }
-
-    amqpChannel.assertExchange(context.RMQ_EXCHANGE, context.RMQ_TYPE, {
-      durable: true,
-    });
-
-    amqpChannel.consume('list_service', this.onListService);
-    amqpChannel.consume('find_service', this.onFindService);
+      this.channel = channel;
+   })
   }
 
   private onListService(msg: Message | null) {
@@ -98,7 +68,7 @@ export default class AMQPServer {
       return;
     }
 
-    const amqpChannel = this.channel.getChannel();
+    const amqpChannel = this.channel;
 
     if (!amqpChannel || !msg) {
       return;
