@@ -83,72 +83,75 @@ export default class AMQPClient {
   }
 
   private async publish() {
-    if (!this.channel) {
-      return;
-    }
+    this.init().then(async () => {
+      if (!this.channel) {
+        return;
+      }
 
-    await this.channel.initializeChannel();
-    
-    const amqpChannel = this.channel.getChannel();
+      await this.channel.initializeChannel();
 
-    if (!amqpChannel) {
-      return;
-    }
+      const amqpChannel = this.channel.getChannel();
 
-    amqpChannel.assertExchange(context.RMQ_EXCHANGE, context.RMQ_TYPE, {
-      durable: true,
+      if (!amqpChannel) {
+        return;
+      }
+
+      amqpChannel.assertExchange(context.RMQ_EXCHANGE, context.RMQ_TYPE, {
+        durable: true,
+      });
+
+      amqpChannel.assertQueue(
+        '',
+        {
+          exclusive: true,
+        },
+        (err, ok) => {
+          this.replyTo = ok.queue;
+          amqpChannel.consume(this.replyTo, this.onResponse);
+        },
+      );
     });
-
-    amqpChannel.assertQueue(
-      '',
-      {
-        exclusive: true,
-      },
-      (err, ok) => {
-        this.replyTo = ok.queue;
-        amqpChannel.consume(this.replyTo, this.onResponse);
-      },
-    );
   }
 
   public async run(request: Request, response: Response) {
-    if (!this.channel) {
-      return;
-    }
+    this.publish().then(async () => {
+      if (!this.channel) {
+        return;
+      }
 
-    await this.channel.initializeChannel();
-    
-    const amqpChannel = this.channel.getChannel();
+      await this.channel.initializeChannel();
 
-    if (!amqpChannel) {
-      return;
-    }
+      const amqpChannel = this.channel.getChannel();
 
+      if (!amqpChannel) {
+        return;
+      }
 
-    const { body } = request;
-    this.correlationId = uuid();
-    this.response = undefined;
+      const { body } = request;
+      this.correlationId = uuid();
+      this.response = undefined;
 
-    const published = amqpChannel.publish(
-      context.RMQ_EXCHANGE,
-      this.route,
-      Buffer.from(JSON.stringify(body)),
-      {
-        replyTo: this.replyTo,
-        correlationId: this.correlationId,
-      },
-    );
+      const published = amqpChannel.publish(
+        context.RMQ_EXCHANGE,
+        this.route,
+        Buffer.from(JSON.stringify(body)),
+        {
+          replyTo: this.replyTo,
+          correlationId: this.correlationId,
+        },
+      );
 
-    if (published) {
-      response.send(this.response);
+      if (published) {
+        response.send(this.response);
 
-      setTimeout(() => {
-        if (this.connection && this.channel) {
-          this.connection.close();
-          amqpChannel.close(() => {});
-        }
-      }, 200);
-    }
+        setTimeout(() => {
+          if (this.connection && this.channel) {
+            this.connection.close();
+            amqpChannel.close(() => {});
+          }
+        }, 200);
+      }
+    });
   }
 
   public onResponse(msg: Message | null): void {
