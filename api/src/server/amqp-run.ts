@@ -54,7 +54,11 @@ export default class AMQPServer {
   };
 
   private init(): void {
-    const amqpChannel = this.channel?.getChannel();
+    if (!this.channel) {
+        return;
+    }
+
+    const amqpChannel = this.channel.getChannel();
 
     if (!amqpChannel) {
       return;
@@ -87,7 +91,11 @@ export default class AMQPServer {
   }
 
   private publish(response: any, msg: Message | null): void {
-    const amqpChannel = this.channel?.getChannel();
+    if (!this.channel) {
+        return;
+    }
+
+    const amqpChannel = this.channel.getChannel();
 
     if (!amqpChannel || !msg) {
       return;
