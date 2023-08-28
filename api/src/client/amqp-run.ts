@@ -3,87 +3,35 @@ import { context } from './context';
 import { Request, Response, response } from 'express';
 import { v4 as uuid } from 'uuid';
 
-class AMQPChannel {
-    private static instance: AMQPChannel | null = null;
-    private channel: Channel | null = null;
-  
-    private constructor(conn: Connection) {
-      this.initChannel(conn);
-    }
-  
-    public static async getInstance(conn: Connection): Promise<AMQPChannel> {
-      if (!AMQPChannel.instance) {
-        AMQPChannel.instance = new AMQPChannel(conn);
-        await AMQPChannel.instance.initChannel(conn);
-      }
-      return AMQPChannel.instance;
-    }
-  
-    private async initChannel(conn: Connection) {
-      return new Promise<void>((resolve, reject) => {
-        conn.createChannel((err, channel) => {
-          if (err) {
-            reject(err);
-          } else {
-            this.channel = channel;
-            resolve();
-          }
-        });
-      });
-    }
-  
-    public getChannel(): Channel {
-      if (!this.channel) {
-        throw new Error('Canal no inicializado');
-      }
-      return this.channel;
-    }
-  }
-
 export default class AMQPClient {
   private correlationId: string | undefined;
   private response: object | undefined;
   private connection: Connection | undefined;
-  private channel: AMQPChannel | null = null;
+  private channel: Channel | undefined;
   private route: string;
   private replyTo: string;
 
   constructor(route: string) {
     this.route = route;
     this.replyTo = '';
-    this.init();
-    this.publish();
   }
 
-  private async init() {
-    return new Promise<void>((resolve, reject) => {
-      amqp.connect(
-        `amqp://${context.RMQ_USER}:${context.RMQ_PASS}@${context.RMQ_HOST}`,
-        (err, conn) => {
-          if (err) {
-            reject(err);
-          } else {
-            AMQPChannel.getInstance(conn)
-              .then((amqpChannel) => {
-                this.channel = amqpChannel;
-                resolve();
-              })
-              .catch(reject);
-          }
-        },
-      );
-    });
+  public async init() {
+    amqp.connect(
+      `amqp://${context.RMQ_USER}:${context.RMQ_PASS}@${context.RMQ_HOST}`,
+      (err, conn) => {
+        if (err) {
+          throw err;
+        }
+
+        this.publish(conn);
+      },
+    );
   }
 
-  private async publish() {
-    this.init().then(async () => {
-      if (!this.channel) {
-        return;
-      }
-
-      await this.channel.initializeChannel();
-
-      const amqpChannel = this.channel.getChannel();
+  private publish(conn: Connection) {
+    conn.createChannel((err, channel) => {
+      const amqpChannel = channel;
 
       if (!amqpChannel) {
         return;
@@ -103,18 +51,15 @@ export default class AMQPClient {
           amqpChannel.consume(this.replyTo, this.onResponse);
         },
       );
+
+      this.channel = channel;
     });
   }
 
   public async run(request: Request, response: Response) {
-    this.publish().then(async () => {
-      if (!this.channel) {
-        return;
-      }
-
-      await this.channel.initializeChannel();
-
-      const amqpChannel = this.channel.getChannel();
+    this.init().then(() => {
+        console.log("INICIALIZANDO: ", this.channel)
+      const amqpChannel = this.channel;
 
       if (!amqpChannel) {
         return;
