@@ -38,7 +38,7 @@ export default class AMQPServer {
         this.onListService(amqpChannel, msg);
       });
       amqpChannel.consume('find_service', (msg) => {
-        this.onListService(amqpChannel, msg);
+        this.onFindService(amqpChannel, msg);
       });
    })
   }
