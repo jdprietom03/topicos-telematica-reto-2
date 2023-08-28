@@ -53,17 +53,19 @@ export default class AMQPClient {
         },
         (err, ok) => {
           this.replyTo = ok.queue;
-          amqpChannel.consume(this.replyTo, this.onResponse);
+          amqpChannel.consume(this.replyTo, this.onResponse, {
+            noAck: false
+          });
         },
       );
 
       this.channel = channel;
 
-      this.run();
+      this.run(conn);
     });
   }
 
-  public run() {
+  public run(conn: Connection) {
     const amqpChannel = this.channel;
 
       if (!amqpChannel) {
