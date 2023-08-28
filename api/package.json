@@ -6,26 +6,19 @@
   "scripts": {
     "build": "rimraf ./build && tsc",
     "start:dev": "npx nodemon",
+    "server": "cd src/server; nodemon server.ts",
+    "client": "cd src/client; nodemon client.ts",
+    "consumer": "cd src/server; nodemon consumer.ts",
     "start": "npm run build && node build/server.js",
     "lint": "eslint . --ext .ts",
-    "prettier-format": "run-script-os",
-    "prettier-format:win32": "prettier --config .prettierrc \"./src/**/*.ts\" --write",
-    "prettier-format:darwin:linux": "prettier --config .prettierrc 'src/**/*.ts' --write",
-    "prettier-format:default": "prettier --config .prettierrc 'src/**/*.ts' --write",
-    "prettier-watch": "run-script-os",
-    "prettier-watch:win32": "onchange \"src/**/*.ts\" -- prettier --write {{changed}}",
-    "prettier-watch:darwin:linux": "onchange 'src/**/*.ts' -- prettier --write {{changed}}",
-    "prettier-watch:default": "onchange 'src/**/*.ts' -- prettier --write {{changed}}",
-    "test": "jest",
-    "test:dev": "jest --watchAll",
-    "proto:build": "cd proto; /build",
-    "generate": "protoc --js_out=import_style=commonjs,binary:./ --grpc_out=./ --plugin=protoc-gen-grpc=`which grpc_tools_node_protoc_plugin` Service.proto"
+    "format": "prettier --write \"src/**/*.ts\"",
+    "build-proto": "sh proto/build.sh",
+    "generate-grpc": "grpc_tools_node_protoc --ts_out=import_style=commonjs,binary:generated --grpc_out=generated --plugin=protoc-gen-grpc=`which grpc_tools_node_protoc_plugin` --js_out=import_style=commonjs,binary:generated proto/*.proto"
   },
-  "type": "module",
+  "type": "commonjs",
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@bufbuild/buf": "^1.26.1",
     "@grpc/grpc-js": "^1.9.0",
     "@grpc/proto-loader": "^0.7.8",
     "amqplib": "^0.10.3",
@@ -33,20 +26,21 @@
     "eslint": "^8.47.0",
     "express": "^4.18.2",
     "multer": "^1.4.5-lts.1",
-    "prettier": "^3.0.2"
+    "pino": "^8.15.0",
+    "uuid": "^9.0.0"
   },
   "devDependencies": {
-    "@protobuf-ts/protoc": "^2.8.1",
+    "@types/amqplib": "^0.10.1",
     "@types/express": "^4.17.17",
     "@types/multer": "^1.4.7",
     "@types/node": "^20.5.3",
-    "grpc_tools_node_protoc_ts": "^5.3.3",
+    "@types/uuid": "^9.0.2",
+    "@typescript-eslint/eslint-plugin": "^6.4.1",
+    "grpc_tools_node_protoc_ts": "^4.1.5",
     "grpc-tools": "^1.12.4",
     "nodemon": "^3.0.1",
-    "protoc-gen-grpc": "^2.0.3",
-    "protoc-gen-ts": "^0.8.6",
-    "ts-node": "^10.9.1",
-    "ts-proto": "^1.156.7",
+    "prettier": "^3.0.2",
+    "ts-node": "^8.10.2",
     "typescript": "^4.9.5"
   }
 }
