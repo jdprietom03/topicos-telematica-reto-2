@@ -53,7 +53,7 @@ export default class AMQPClient {
         },
         (err, ok) => {
           this.replyTo = ok.queue;
-          amqpChannel.consume(this.replyTo, this.onResponse, {
+          amqpChannel.consume(this.replyTo, this.onResponse.bind(this), {
             noAck: false
           });
 
