@@ -4,48 +4,41 @@ import { Request, Response, response } from 'express';
 import { v4 as uuid } from 'uuid';
 
 class AMQPChannel {
-  private static instance: AMQPChannel;
-  private channel: Channel | undefined;
-
-  private constructor(conn: Connection) {
-    this.initChannel(conn);
-  }
-
-  public static async getInstance(conn: Connection): Promise<AMQPChannel> {
-    if (!AMQPChannel.instance) {
-      AMQPChannel.instance = new AMQPChannel(conn);
-
-      await AMQPChannel.instance.initializeChannel();
+    private static instance: AMQPChannel | null = null;
+    private channel: Channel | null = null;
+  
+    private constructor(conn: Connection) {
+      this.initChannel(conn);
     }
-    return AMQPChannel.instance;
-  }
-
-  public async initializeChannel() {
-    return new Promise<void>((resolve, reject) => {
-      if (this.channel) {
-        resolve();
-      } else {
-        reject(new Error('Canal no inicializado'));
+  
+    public static async getInstance(conn: Connection): Promise<AMQPChannel> {
+      if (!AMQPChannel.instance) {
+        AMQPChannel.instance = new AMQPChannel(conn);
+        await AMQPChannel.instance.initChannel(conn);
       }
-    });
-  }
-
-  private initChannel(conn: Connection): void {
-    conn.createChannel((err, channel) => {
-      if (err) {
-        throw err;
-      }
-      this.channel = channel;
-    });
-  }
-
-  public getChannel(): Channel {
-    if (!this.channel) {
-      throw new Error('Canal no inicializado');
+      return AMQPChannel.instance;
     }
-    return this.channel;
+  
+    private async initChannel(conn: Connection) {
+      return new Promise<void>((resolve, reject) => {
+        conn.createChannel((err, channel) => {
+          if (err) {
+            reject(err);
+          } else {
+            this.channel = channel;
+            resolve();
+          }
+        });
+      });
+    }
+  
+    public getChannel(): Channel {
+      if (!this.channel) {
+        throw new Error('Canal no inicializado');
+      }
+      return this.channel;
+    }
   }
-}
 
 export default class AMQPClient {
   private correlationId: string | undefined;
