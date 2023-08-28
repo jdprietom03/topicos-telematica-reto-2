@@ -75,47 +75,46 @@ export namespace FileInfo {
     }
 }
 
-export class FindFileByNameRequest extends jspb.Message { 
+export class FindFilesRequest extends jspb.Message { 
     getFileName(): string;
-    setFileName(value: string): FindFileByNameRequest;
+    setFileName(value: string): FindFilesRequest;
 
 
     serializeBinary(): Uint8Array;
-    toObject(includeInstance?: boolean): FindFileByNameRequest.AsObject;
-    static toObject(includeInstance: boolean, msg: FindFileByNameRequest): FindFileByNameRequest.AsObject;
+    toObject(includeInstance?: boolean): FindFilesRequest.AsObject;
+    static toObject(includeInstance: boolean, msg: FindFilesRequest): FindFilesRequest.AsObject;
     static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
     static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
-    static serializeBinaryToWriter(message: FindFileByNameRequest, writer: jspb.BinaryWriter): void;
-    static deserializeBinary(bytes: Uint8Array): FindFileByNameRequest;
-    static deserializeBinaryFromReader(message: FindFileByNameRequest, reader: jspb.BinaryReader): FindFileByNameRequest;
+    static serializeBinaryToWriter(message: FindFilesRequest, writer: jspb.BinaryWriter): void;
+    static deserializeBinary(bytes: Uint8Array): FindFilesRequest;
+    static deserializeBinaryFromReader(message: FindFilesRequest, reader: jspb.BinaryReader): FindFilesRequest;
 }
 
-export namespace FindFileByNameRequest {
+export namespace FindFilesRequest {
     export type AsObject = {
         fileName: string,
     }
 }
 
-export class FindFileByNameResponse extends jspb.Message { 
-
-    hasFileInfo(): boolean;
-    clearFileInfo(): void;
-    getFileInfo(): FileInfo | undefined;
-    setFileInfo(value?: FileInfo): FindFileByNameResponse;
+export class FindFilesResponse extends jspb.Message { 
+    clearFilesInfoList(): void;
+    getFilesInfoList(): Array<FileInfo>;
+    setFilesInfoList(value: Array<FileInfo>): FindFilesResponse;
+    addFilesInfo(value?: FileInfo, index?: number): FileInfo;
 
 
     serializeBinary(): Uint8Array;
-    toObject(includeInstance?: boolean): FindFileByNameResponse.AsObject;
-    static toObject(includeInstance: boolean, msg: FindFileByNameResponse): FindFileByNameResponse.AsObject;
+    toObject(includeInstance?: boolean): FindFilesResponse.AsObject;
+    static toObject(includeInstance: boolean, msg: FindFilesResponse): FindFilesResponse.AsObject;
     static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
     static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
-    static serializeBinaryToWriter(message: FindFileByNameResponse, writer: jspb.BinaryWriter): void;
-    static deserializeBinary(bytes: Uint8Array): FindFileByNameResponse;
-    static deserializeBinaryFromReader(message: FindFileByNameResponse, reader: jspb.BinaryReader): FindFileByNameResponse;
+    static serializeBinaryToWriter(message: FindFilesResponse, writer: jspb.BinaryWriter): void;
+    static deserializeBinary(bytes: Uint8Array): FindFilesResponse;
+    static deserializeBinaryFromReader(message: FindFilesResponse, reader: jspb.BinaryReader): FindFilesResponse;
 }
 
-export namespace FindFileByNameResponse {
+export namespace FindFilesResponse {
     export type AsObject = {
-        fileInfo?: FileInfo.AsObject,
+        filesInfoList: Array<FileInfo.AsObject>,
     }
 }

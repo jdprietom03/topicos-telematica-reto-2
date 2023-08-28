@@ -4,26 +4,26 @@
 var grpc = require('@grpc/grpc-js');
 var proto_FileService_pb = require('../proto/FileService_pb.js');
 
-function serialize_file_service_FindFileByNameRequest(arg) {
-  if (!(arg instanceof proto_FileService_pb.FindFileByNameRequest)) {
-    throw new Error('Expected argument of type file_service.FindFileByNameRequest');
+function serialize_file_service_FindFilesRequest(arg) {
+  if (!(arg instanceof proto_FileService_pb.FindFilesRequest)) {
+    throw new Error('Expected argument of type file_service.FindFilesRequest');
   }
   return Buffer.from(arg.serializeBinary());
 }
 
-function deserialize_file_service_FindFileByNameRequest(buffer_arg) {
-  return proto_FileService_pb.FindFileByNameRequest.deserializeBinary(new Uint8Array(buffer_arg));
+function deserialize_file_service_FindFilesRequest(buffer_arg) {
+  return proto_FileService_pb.FindFilesRequest.deserializeBinary(new Uint8Array(buffer_arg));
 }
 
-function serialize_file_service_FindFileByNameResponse(arg) {
-  if (!(arg instanceof proto_FileService_pb.FindFileByNameResponse)) {
-    throw new Error('Expected argument of type file_service.FindFileByNameResponse');
+function serialize_file_service_FindFilesResponse(arg) {
+  if (!(arg instanceof proto_FileService_pb.FindFilesResponse)) {
+    throw new Error('Expected argument of type file_service.FindFilesResponse');
   }
   return Buffer.from(arg.serializeBinary());
 }
 
-function deserialize_file_service_FindFileByNameResponse(buffer_arg) {
-  return proto_FileService_pb.FindFileByNameResponse.deserializeBinary(new Uint8Array(buffer_arg));
+function deserialize_file_service_FindFilesResponse(buffer_arg) {
+  return proto_FileService_pb.FindFilesResponse.deserializeBinary(new Uint8Array(buffer_arg));
 }
 
 function serialize_file_service_ListFilesRequest(arg) {
@@ -61,16 +61,16 @@ var FileServiceService = exports.FileServiceService = {
     responseSerialize: serialize_file_service_ListFilesResponse,
     responseDeserialize: deserialize_file_service_ListFilesResponse,
   },
-  findFileByName: {
-    path: '/file_service.FileService/FindFileByName',
+  findFiles: {
+    path: '/file_service.FileService/FindFiles',
     requestStream: false,
     responseStream: false,
-    requestType: proto_FileService_pb.FindFileByNameRequest,
-    responseType: proto_FileService_pb.FindFileByNameResponse,
-    requestSerialize: serialize_file_service_FindFileByNameRequest,
-    requestDeserialize: deserialize_file_service_FindFileByNameRequest,
-    responseSerialize: serialize_file_service_FindFileByNameResponse,
-    responseDeserialize: deserialize_file_service_FindFileByNameResponse,
+    requestType: proto_FileService_pb.FindFilesRequest,
+    responseType: proto_FileService_pb.FindFilesResponse,
+    requestSerialize: serialize_file_service_FindFilesRequest,
+    requestDeserialize: deserialize_file_service_FindFilesRequest,
+    responseSerialize: serialize_file_service_FindFilesResponse,
+    responseDeserialize: deserialize_file_service_FindFilesResponse,
   },
 };
 

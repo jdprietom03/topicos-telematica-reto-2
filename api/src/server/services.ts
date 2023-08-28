@@ -1,8 +1,8 @@
-import { FileService } from "./classes/FileService";
-import { ProductService } from "./classes/ProductService";
-import { ProtoService } from "./classes/ProtoService";
+import { FileWrapperService } from './wrappers/FileWrapperService';
+import { ProductWrapperService } from './wrappers/ProductWrapperService';
+import { ProtoWrapperService } from './wrappers/ProtoWrapperService';
 
-export const services: ProtoService[]  = [
-	new FileService(),
-	new ProductService()
-]
+export const services: ProtoWrapperService[] = [
+  new FileWrapperService(),
+  new ProductWrapperService(),
+];

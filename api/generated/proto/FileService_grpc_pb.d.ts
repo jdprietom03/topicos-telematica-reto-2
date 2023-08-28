@@ -9,7 +9,7 @@ import * as proto_FileService_pb from "../proto/FileService_pb";
 
 interface IFileServiceService extends grpc.ServiceDefinition<grpc.UntypedServiceImplementation> {
     listFiles: IFileServiceService_IListFiles;
-    findFileByName: IFileServiceService_IFindFileByName;
+    findFiles: IFileServiceService_IFindFiles;
 }
 
 interface IFileServiceService_IListFiles extends grpc.MethodDefinition<proto_FileService_pb.ListFilesRequest, proto_FileService_pb.ListFilesResponse> {
@@ -21,30 +21,30 @@ interface IFileServiceService_IListFiles extends grpc.MethodDefinition<proto_Fil
     responseSerialize: grpc.serialize<proto_FileService_pb.ListFilesResponse>;
     responseDeserialize: grpc.deserialize<proto_FileService_pb.ListFilesResponse>;
 }
-interface IFileServiceService_IFindFileByName extends grpc.MethodDefinition<proto_FileService_pb.FindFileByNameRequest, proto_FileService_pb.FindFileByNameResponse> {
-    path: "/file_service.FileService/FindFileByName";
+interface IFileServiceService_IFindFiles extends grpc.MethodDefinition<proto_FileService_pb.FindFilesRequest, proto_FileService_pb.FindFilesResponse> {
+    path: "/file_service.FileService/FindFiles";
     requestStream: false;
     responseStream: false;
-    requestSerialize: grpc.serialize<proto_FileService_pb.FindFileByNameRequest>;
-    requestDeserialize: grpc.deserialize<proto_FileService_pb.FindFileByNameRequest>;
-    responseSerialize: grpc.serialize<proto_FileService_pb.FindFileByNameResponse>;
-    responseDeserialize: grpc.deserialize<proto_FileService_pb.FindFileByNameResponse>;
+    requestSerialize: grpc.serialize<proto_FileService_pb.FindFilesRequest>;
+    requestDeserialize: grpc.deserialize<proto_FileService_pb.FindFilesRequest>;
+    responseSerialize: grpc.serialize<proto_FileService_pb.FindFilesResponse>;
+    responseDeserialize: grpc.deserialize<proto_FileService_pb.FindFilesResponse>;
 }
 
 export const FileServiceService: IFileServiceService;
 
 export interface IFileServiceServer {
     listFiles: grpc.handleUnaryCall<proto_FileService_pb.ListFilesRequest, proto_FileService_pb.ListFilesResponse>;
-    findFileByName: grpc.handleUnaryCall<proto_FileService_pb.FindFileByNameRequest, proto_FileService_pb.FindFileByNameResponse>;
+    findFiles: grpc.handleUnaryCall<proto_FileService_pb.FindFilesRequest, proto_FileService_pb.FindFilesResponse>;
 }
 
 export interface IFileServiceClient {
     listFiles(request: proto_FileService_pb.ListFilesRequest, callback: (error: grpc.ServiceError | null, response: proto_FileService_pb.ListFilesResponse) => void): grpc.ClientUnaryCall;
     listFiles(request: proto_FileService_pb.ListFilesRequest, metadata: grpc.Metadata, callback: (error: grpc.ServiceError | null, response: proto_FileService_pb.ListFilesResponse) => void): grpc.ClientUnaryCall;
     listFiles(request: proto_FileService_pb.ListFilesRequest, metadata: grpc.Metadata, options: Partial<grpc.CallOptions>, callback: (error: grpc.ServiceError | null, response: proto_FileService_pb.ListFilesResponse) => void): grpc.ClientUnaryCall;
-    findFileByName(request: proto_FileService_pb.FindFileByNameRequest, callback: (error: grpc.ServiceError | null, response: proto_FileService_pb.FindFileByNameResponse) => void): grpc.ClientUnaryCall;
-    findFileByName(request: proto_FileService_pb.FindFileByNameRequest, metadata: grpc.Metadata, callback: (error: grpc.ServiceError | null, response: proto_FileService_pb.FindFileByNameResponse) => void): grpc.ClientUnaryCall;
-    findFileByName(request: proto_FileService_pb.FindFileByNameRequest, metadata: grpc.Metadata, options: Partial<grpc.CallOptions>, callback: (error: grpc.ServiceError | null, response: proto_FileService_pb.FindFileByNameResponse) => void): grpc.ClientUnaryCall;
+    findFiles(request: proto_FileService_pb.FindFilesRequest, callback: (error: grpc.ServiceError | null, response: proto_FileService_pb.FindFilesResponse) => void): grpc.ClientUnaryCall;
+    findFiles(request: proto_FileService_pb.FindFilesRequest, metadata: grpc.Metadata, callback: (error: grpc.ServiceError | null, response: proto_FileService_pb.FindFilesResponse) => void): grpc.ClientUnaryCall;
+    findFiles(request: proto_FileService_pb.FindFilesRequest, metadata: grpc.Metadata, options: Partial<grpc.CallOptions>, callback: (error: grpc.ServiceError | null, response: proto_FileService_pb.FindFilesResponse) => void): grpc.ClientUnaryCall;
 }
 
 export class FileServiceClient extends grpc.Client implements IFileServiceClient {
@@ -52,7 +52,7 @@ export class FileServiceClient extends grpc.Client implements IFileServiceClient
     public listFiles(request: proto_FileService_pb.ListFilesRequest, callback: (error: grpc.ServiceError | null, response: proto_FileService_pb.ListFilesResponse) => void): grpc.ClientUnaryCall;
     public listFiles(request: proto_FileService_pb.ListFilesRequest, metadata: grpc.Metadata, callback: (error: grpc.ServiceError | null, response: proto_FileService_pb.ListFilesResponse) => void): grpc.ClientUnaryCall;
     public listFiles(request: proto_FileService_pb.ListFilesRequest, metadata: grpc.Metadata, options: Partial<grpc.CallOptions>, callback: (error: grpc.ServiceError | null, response: proto_FileService_pb.ListFilesResponse) => void): grpc.ClientUnaryCall;
-    public findFileByName(request: proto_FileService_pb.FindFileByNameRequest, callback: (error: grpc.ServiceError | null, response: proto_FileService_pb.FindFileByNameResponse) => void): grpc.ClientUnaryCall;
-    public findFileByName(request: proto_FileService_pb.FindFileByNameRequest, metadata: grpc.Metadata, callback: (error: grpc.ServiceError | null, response: proto_FileService_pb.FindFileByNameResponse) => void): grpc.ClientUnaryCall;
-    public findFileByName(request: proto_FileService_pb.FindFileByNameRequest, metadata: grpc.Metadata, options: Partial<grpc.CallOptions>, callback: (error: grpc.ServiceError | null, response: proto_FileService_pb.FindFileByNameResponse) => void): grpc.ClientUnaryCall;
+    public findFiles(request: proto_FileService_pb.FindFilesRequest, callback: (error: grpc.ServiceError | null, response: proto_FileService_pb.FindFilesResponse) => void): grpc.ClientUnaryCall;
+    public findFiles(request: proto_FileService_pb.FindFilesRequest, metadata: grpc.Metadata, callback: (error: grpc.ServiceError | null, response: proto_FileService_pb.FindFilesResponse) => void): grpc.ClientUnaryCall;
+    public findFiles(request: proto_FileService_pb.FindFilesRequest, metadata: grpc.Metadata, options: Partial<grpc.CallOptions>, callback: (error: grpc.ServiceError | null, response: proto_FileService_pb.FindFilesResponse) => void): grpc.ClientUnaryCall;
 }
